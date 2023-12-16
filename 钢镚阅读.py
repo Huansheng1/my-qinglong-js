@@ -1,3 +1,11 @@
+"""
+活动地址: http://w.6mcyrj8t2qnq.cloud/?p=2918458
+脚本更新时间: 2023-12-13
+抓包获取: Cookie，UserAgent。
+key参数为PushPlus推送加的token用于接收通知，配置示例:["通知key1", "通知key2", "通知key3"]有几个写几个。
+desc是这个账号的描述, count是这个账号每天跑多少篇最大180。
+cron: */30 8-18 * * * 钢镚阅读.py
+"""
 import datetime
 import os
 import random
@@ -8,14 +16,6 @@ import requests
 import json
 from concurrent.futures import ThreadPoolExecutor
 
-# 活动地址: http://w.6mcyrj8t2qnq.cloud/?p=2918458
-# 脚本更新时间: 2023-12-13
-"""
-抓包获取: Cookie，UserAgent。
-key参数为PushPlus推送加的token用于接收通知，配置示例:["通知key1", "通知key2", "通知key3"]有几个写几个。
-desc是这个账号的描述, count是这个账号每天跑多少篇最大180。
-"""
-# cron: */30 8-18 * * * nohup python3 /path/task.py >> /dev/null 2>&1 &
 """""" "只需要改下面的部分" """"""
 accounts_list = [
     {
