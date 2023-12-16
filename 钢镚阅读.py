@@ -18,11 +18,9 @@ import json
 import emoji
 from concurrent.futures import ThreadPoolExecutor
 
-gbyd_cookie = os.environ.get("GBYD_COOKIE")
-
 accounts_list = [
     {
-        "Cookie": gbyd_cookie,
+        "Cookie": os.environ.get("GBYD_COOKIE"),
         "UA": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.44(0x18002c2b) NetType/WIFI Language/en",
         "keys": [
             "a97fdd804d3d4228a13451c2a5db948e",
