@@ -1,5 +1,5 @@
 """
-活动地址: http://w.6mcyrj8t2qnq.cloud/?p=2956396
+活动地址: http://2956396.w.u5re46414.3l0mqnkypptv.cloud/?p=2956396
 脚本更新时间: 2023-12-13
 抓包获取: Cookie，UserAgent。
 key参数为PushPlus推送加的token用于接收通知，配置示例:["通知key1", "通知key2", "通知key3"]有几个写几个。
@@ -12,19 +12,22 @@ import random
 import hashlib
 import re
 import time
+import traceback
 import requests
 import json
+import emoji
 from concurrent.futures import ThreadPoolExecutor
 
-"""""" "只需要改下面的部分" """"""
+gbyd_cookie = os.environ.get("GBYD_COOKIE")
+
 accounts_list = [
     {
-        "Cookie": "zzbb_info=%7B%22openid%22%3A%22oF1b14oJ4opUjWH9gvL41aS7CG9Y%22%2C%22pid%22%3A2920660%2C%22uid%22%3A2956396%7D; gfsessionid=o-0fIv-_HEjjSvRLtm52jWfPvQwg",
+        "Cookie": gbyd_cookie,
         "UA": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.44(0x18002c2b) NetType/WIFI Language/en",
         "keys": [
             "a97fdd804d3d4228a13451c2a5db948e",
         ],
-        "desc": "halfroom",
+        "desc": "大号",
         "count": 180,
     },
     # {
@@ -55,11 +58,12 @@ check = [
 
 
 def log(message):
-    print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]}] {message}')
+    print(
+        f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]}] {message}'
+    )
 
 
 def send_notification(title, content, keys):
-    content += f', 事件ID：{datetime.now().strftime("%Y%m%d%H%M%S%f")[:-3]}'
     log(content)
     # 发送到pushplus
     send_pushplus_notification(title, content, keys)
@@ -71,7 +75,7 @@ def send_notification(title, content, keys):
 
 def send_pushplus_notification(title, content, keys):
     pushplus_url = "http://www.pushplus.plus/send"
-
+    content += f', 事件ID：{datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")[:-3]}'
     for key in keys:
         pushplus_data = {
             "template": "txt",
@@ -142,7 +146,10 @@ def calculate_sign():
     return sha256_hash.hexdigest(), current_time
 
 
-def read_articles(cookie, UA, keys, desc, count):
+def read_articles(cookie, UA, keys, desc, count, acct_idx):
+    if not cookie:
+        log(f"账号[{desc}]未获取到cookie")
+        return
     time.sleep(random.randint(1, 6))
     url = "http://2903155.mwierdnx2hd0.ntryvuir104.fnpz9xy95zkel.cloud/share"
     headers = {"User-Agent": UA, "Cookie": cookie}
@@ -241,7 +248,9 @@ def read_articles(cookie, UA, keys, desc, count):
                     total_gold = gold
                     remain = response["data"]["remain"]
                     total_remain = remain
-                    # print(f"第 {o + 1} 篇阅读成功--获得钢镚：{gain} 💰\n今日阅读：{read} 篇--今日获取：{gold} 💰\n可提现钢镚：{remain} 💰")
+                    log(
+                        f"账号{desc}：第 {o + 1} 篇阅读成功--获得钢镚：{gain} {emoji.emojize(':moneybag:')},今日阅读：{read} 篇--今日获取：{gold} {emoji.emojize(':moneybag:')},可提{remain} {emoji.emojize(':moneybag:')}"
+                    )
                     if read > count:
                         time.sleep(random.randint(1, 6))
                         send_notification(
@@ -266,21 +275,23 @@ def read_articles(cookie, UA, keys, desc, count):
         )
 
 
-def execute_accounts(account):
-    cookie = account.get("Cookie")
-    ua = account.get("UA")
-    desc = account.get("desc")
-    keys = account.get("keys")
-    count = account.get("count")
-    read_articles(cookie=cookie, UA=ua, keys=keys, desc=desc, count=count)
+def execute_accounts(account, index):
+    try:
+        cookie = account.get("Cookie")
+        ua = account.get("UA")
+        desc = account.get("desc")
+        keys = account.get("keys")
+        count = account.get("count")
+        read_articles(
+            cookie=cookie, UA=ua, keys=keys, desc=desc, count=count, acct_idx=index
+        )
+    except Exception as e:
+        log(f"发生运行时异常：{e}")
+        traceback.print_exc()  # 打印异常栈信息
 
 
 # 使用线程池执行每个账号的任务
 with ThreadPoolExecutor(max_workers=len(accounts_list)) as executor:
-    for account_info in accounts_list:
-        executor.submit(execute_accounts, account_info)
-        time.sleep(random.randint(1, 6))  # 等待一秒钟再执行下一个任务,保证不会并发推送导致推送失败
-
-# # 使用线程池执行每个账号的任务
-# with ThreadPoolExecutor(max_workers=len(accounts_list)) as executor:
-#     executor.map(execute_accounts, accounts_list)
+    for index, account_info in enumerate(accounts_list, start=1):
+        executor.submit(execute_accounts, account_info, index)
+        time.sleep(random.randint(1, 6))
