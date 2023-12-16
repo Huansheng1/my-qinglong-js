@@ -1,5 +1,5 @@
 """
-活动地址: http://w.6mcyrj8t2qnq.cloud/?p=2918458
+活动地址: http://w.6mcyrj8t2qnq.cloud/?p=2956396
 脚本更新时间: 2023-12-13
 抓包获取: Cookie，UserAgent。
 key参数为PushPlus推送加的token用于接收通知，配置示例:["通知key1", "通知key2", "通知key3"]有几个写几个。
