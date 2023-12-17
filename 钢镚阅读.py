@@ -227,7 +227,9 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
                 nickname = matches1.group(1) if matches1 else None
                 if biz in check:
                     time.sleep(random.randint(1, 6))
-                    send_notification("检测文章", f"账号[{desc}]发现检测文章, 标题:{nickname}", key)
+                    send_notification(
+                        "检测文章", f"账号[{desc}]发现检测文章, 请手动阅读一篇，标题:{nickname}", key
+                    )
                     break  # 如果检测到文章，跳出循环
                 sleep = random.randint(23, 38)
                 time.sleep(sleep)
