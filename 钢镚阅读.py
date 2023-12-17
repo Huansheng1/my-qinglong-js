@@ -16,6 +16,7 @@ import os
 import random
 import hashlib
 import re
+import sys
 import time
 import traceback
 import requests
@@ -24,9 +25,11 @@ import emoji
 from concurrent.futures import ThreadPoolExecutor
 
 gbyd_cookie = os.environ.get("GBYD_COOKIE")
-# gbyd_cookie = "zzbb_info=%7B%22openid%22%3A%22oF1b14oJ4opUjWH9gvL41aS7CG9Y%22%2C%22pid%22%3A2920660%2C%22uid%22%3A2956396%7D; gfsessionid=o-0fIv-_HEjjSvRLtm52jWfPvQwg&pushplus=a97fdd804d3d4228a13451c2a5db948&desc=大号&&&zzbb_info=%7B%22openid%22%3A%22oF1b14uS_ZsXU2e_MfONor5QfLTU%22%2C%22pid%22%3A2956396%2C%22uid%22%3A2992011%7D; gfsessionid=o-0fIv_ZFL9yiUKmWVqSPzROyywc&pushplus=7a30cef08741413bbb4917e21d59b50a&desc=小尾巴"
 # 按 "&&&" 分割成多个账号信息
+if type(gbyd_cookie) != str:
+    gbyd_cookie = ""
 account_infos = gbyd_cookie.split("&&&")
+
 # 初始化账号列表
 accounts_list = []
 
@@ -66,7 +69,7 @@ check = [
 def log(message):
     print(
         emoji.emojize(
-            f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]}] {message} :thumbs_up:'
+            f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]}] {message}'
         )
     )
 
@@ -297,6 +300,9 @@ def execute_accounts(account, index):
         traceback.print_exc()  # 打印异常栈信息
 
 
+if len(accounts_list) < 1:
+    log("没有读取到账号")
+    sys.exit(0)
 # 使用线程池执行每个账号的任务
 with ThreadPoolExecutor(max_workers=len(accounts_list)) as executor:
     for index, account_info in enumerate(accounts_list, start=1):
