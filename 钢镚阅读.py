@@ -23,8 +23,8 @@ import json
 import emoji
 from concurrent.futures import ThreadPoolExecutor
 
-# gbyd_cookie = os.environ.get("GBYD_COOKIE")
-gbyd_cookie = "zzbb_info=%7B%22openid%22%3A%22oF1b14oJ4opUjWH9gvL41aS7CG9Y%22%2C%22pid%22%3A2920660%2C%22uid%22%3A2956396%7D; gfsessionid=o-0fIv-_HEjjSvRLtm52jWfPvQwg&pushplus=a97fdd804d3d4228a13451c2a5db948&desc=大号&&&zzbb_info=%7B%22openid%22%3A%22oF1b14uS_ZsXU2e_MfONor5QfLTU%22%2C%22pid%22%3A2956396%2C%22uid%22%3A2992011%7D; gfsessionid=o-0fIv_ZFL9yiUKmWVqSPzROyywc&pushplus=7a30cef08741413bbb4917e21d59b50a&desc=小尾巴"
+gbyd_cookie = os.environ.get("GBYD_COOKIE")
+# gbyd_cookie = "zzbb_info=%7B%22openid%22%3A%22oF1b14oJ4opUjWH9gvL41aS7CG9Y%22%2C%22pid%22%3A2920660%2C%22uid%22%3A2956396%7D; gfsessionid=o-0fIv-_HEjjSvRLtm52jWfPvQwg&pushplus=a97fdd804d3d4228a13451c2a5db948&desc=大号&&&zzbb_info=%7B%22openid%22%3A%22oF1b14uS_ZsXU2e_MfONor5QfLTU%22%2C%22pid%22%3A2956396%2C%22uid%22%3A2992011%7D; gfsessionid=o-0fIv_ZFL9yiUKmWVqSPzROyywc&pushplus=7a30cef08741413bbb4917e21d59b50a&desc=小尾巴"
 # 按 "&&&" 分割成多个账号信息
 account_infos = gbyd_cookie.split("&&&")
 # 初始化账号列表
