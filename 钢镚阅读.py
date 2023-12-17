@@ -3,7 +3,12 @@
 脚本更新时间: 2023-12-13
 抓包获取: Cookie，UserAgent。
 key参数为PushPlus推送加的token用于接收通知，配置示例:["通知key1", "通知key2", "通知key3"]有几个写几个。
+青龙脚本配置：请在环境变量配置GBYD_COOKIE，变量值为你抓取到的cookie与pushplus的token拼接，例如："cookie&pushplus=xxxxxx&desc=大号"，
+如果多个账号请用'&&&'隔开，例如："cookie1&pushplus=11111&desc=大号&&&cookie2&pushplus=22222&desc=小号1"
 desc是这个账号的描述, count是这个账号每天跑多少篇最大180。
+如果要推送discord请在配置文件里配置变量DISCORD_WEBHOOK_URL，例如
+export DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/idxxx/xxxxxxxxx"
+如果要推送telegram，也请在配置文件里配置好，与qinglong共用变量
 cron: */30 8-18 * * * 钢镚阅读.py
 """
 import datetime
@@ -18,26 +23,29 @@ import json
 import emoji
 from concurrent.futures import ThreadPoolExecutor
 
-accounts_list = [
-    {
-        "Cookie": os.environ.get("GBYD_COOKIE"),
-        "UA": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.44(0x18002c2b) NetType/WIFI Language/en",
-        "keys": [
-            "a97fdd804d3d4228a13451c2a5db948e",
-        ],
-        "desc": "大号",
-        "count": 180,
-    },
-    # {
-    #     "Cookie": "cookie",
-    #     "UA": "ua",
-    #     "keys": ["通知key"],
-    #     "desc": "账号2",
-    #     "count": 180,
-    # },
-    # 添加更多账号信息...
-]
-"""""" "只需要改上面的部分" """"""
+# gbyd_cookie = os.environ.get("GBYD_COOKIE")
+gbyd_cookie = "zzbb_info=%7B%22openid%22%3A%22oF1b14oJ4opUjWH9gvL41aS7CG9Y%22%2C%22pid%22%3A2920660%2C%22uid%22%3A2956396%7D; gfsessionid=o-0fIv-_HEjjSvRLtm52jWfPvQwg&pushplus=a97fdd804d3d4228a13451c2a5db948&desc=大号&&&zzbb_info=%7B%22openid%22%3A%22oF1b14uS_ZsXU2e_MfONor5QfLTU%22%2C%22pid%22%3A2956396%2C%22uid%22%3A2992011%7D; gfsessionid=o-0fIv_ZFL9yiUKmWVqSPzROyywc&pushplus=7a30cef08741413bbb4917e21d59b50a&desc=小尾巴"
+# 按 "&&&" 分割成多个账号信息
+account_infos = gbyd_cookie.split("&&&")
+# 初始化账号列表
+accounts_list = []
+
+# 遍历每个账号信息
+for account_info in account_infos:
+    # 按 "&" 分割成多个字段
+    fields = account_info.split("&")
+    # 检查是否有足够的字段
+    if len(fields) >= 3:
+        # 创建账号字典
+        account_dict = {
+            "Cookie": fields[0],
+            "key": fields[1].split("=")[-1],  # 获取key字段的值
+            "desc": fields[2].split("=")[-1],  # 获取desc字段的值
+            "UA": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.44(0x18002c2b) NetType/WIFI Language/en",
+            "count": 180,
+        }
+        # 将账号字典添加到列表中
+        accounts_list.append(account_dict)
 
 check = [
     "MzkzMzI5NjQ3MA==",
@@ -57,38 +65,39 @@ check = [
 
 def log(message):
     print(
-        f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]}] {message}'
+        emoji.emojize(
+            f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]}] {message} :thumbs_up:'
+        )
     )
 
 
-def send_notification(title, content, keys):
+def send_notification(title, content, key):
     log(content)
     # 发送到pushplus
-    send_pushplus_notification(title, content, keys)
+    send_pushplus_notification(title, content, key)
     # 发送tg
     send_telegram_notification(title, content)
     # 发送到discord
     send_discord_notification(title, content)
 
 
-def send_pushplus_notification(title, content, keys):
+def send_pushplus_notification(title, content, key):
     pushplus_url = "http://www.pushplus.plus/send"
     content += f', 事件ID：{datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")[:-3]}'
-    for key in keys:
-        pushplus_data = {
-            "template": "txt",
-            "token": key,
-            "title": title,
-            "content": content,
-        }
+    pushplus_data = {
+        "template": "txt",
+        "token": key,
+        "title": title,
+        "content": content,
+    }
 
-        try:
-            with requests.Session() as session:
-                session.post(pushplus_url, data=pushplus_data, timeout=10)
-        except requests.Timeout:
-            pass
-        except requests.RequestException as e:
-            log("PushPlus推送时出错: {e}")
+    try:
+        with requests.Session() as session:
+            session.post(pushplus_url, data=pushplus_data, timeout=10)
+    except requests.Timeout:
+        pass
+    except requests.RequestException as e:
+        log("PushPlus推送时出错: {e}")
 
 
 def send_telegram_notification(title, content):
@@ -144,7 +153,7 @@ def calculate_sign():
     return sha256_hash.hexdigest(), current_time
 
 
-def read_articles(cookie, UA, keys, desc, count, acct_idx):
+def read_articles(cookie, UA, key, desc, count, acct_idx):
     if not cookie:
         log(f"账号[{desc}]未获取到cookie")
         return
@@ -165,7 +174,7 @@ def read_articles(cookie, UA, keys, desc, count, acct_idx):
         host = match.group(1)
     else:
         time.sleep(random.randint(1, 6))
-        send_notification("error", f"{response['message']}", keys)
+        send_notification("error", f"{response['message']}", key)
         return
     total_gain = 0  # 记录总的阅读积分
     total_read = 0
@@ -184,8 +193,8 @@ def read_articles(cookie, UA, keys, desc, count, acct_idx):
         time.sleep(random.randint(1, 6))
         send_notification(
             "退出",
-            f"账号:{desc}\n超过设置最大阅读数!, 当前阅读 {res['data']['read']} 篇, 设置最大阅读数 {count} 篇",
-            keys,
+            f"账号[{desc}]超过设置最大阅读数!, 当前阅读 {res['data']['read']} 篇, 设置最大阅读数 {count} 篇",
+            key,
         )
         return
     for o in range(30):
@@ -200,7 +209,7 @@ def read_articles(cookie, UA, keys, desc, count, acct_idx):
             response = requests.get(url, headers=headers, json=data, timeout=7).json()
         if response["code"] == 1:
             message = response["message"]
-            # await send_notification("退出", f"账号:{desc}\n已退出！{response['message']}", key)
+            # await send_notification("退出", f"账号[{desc}]已退出！{response['message']}", key)
             break
         else:
             try:
@@ -215,7 +224,7 @@ def read_articles(cookie, UA, keys, desc, count, acct_idx):
                 nickname = matches1.group(1) if matches1 else None
                 if biz in check:
                     time.sleep(random.randint(1, 6))
-                    send_notification("检测文章", f"账号:{desc}\n发现检测文章, 标题:{nickname}", keys)
+                    send_notification("检测文章", f"账号[{desc}]发现检测文章, 标题:{nickname}", key)
                     break  # 如果检测到文章，跳出循环
                 sleep = random.randint(23, 38)
                 time.sleep(sleep)
@@ -247,14 +256,14 @@ def read_articles(cookie, UA, keys, desc, count, acct_idx):
                     remain = response["data"]["remain"]
                     total_remain = remain
                     log(
-                        f"账号{desc}：第 {o + 1} 篇阅读成功--获得钢镚：{gain} {emoji.emojize(':moneybag:')},今日阅读：{read} 篇--今日获取：{gold} {emoji.emojize(':moneybag:')},可提{remain} {emoji.emojize(':moneybag:')}"
+                        f"账号[{desc}]第 {o + 1} 篇阅读成功--获得钢镚：{gain} :money_bag: ,今日阅读：{read} 篇--今日获取：{gold} :money_bag:,可提{remain} :money_bag:"
                     )
                     if read > count:
                         time.sleep(random.randint(1, 6))
                         send_notification(
                             "退出",
-                            f"账号:{desc}\n超过设置最大阅读数!, 当前阅读 {read} 篇, 设置最大阅读数 {count} 篇",
-                            keys,
+                            f"账号[{desc}]超过设置最大阅读数!, 当前阅读 {read} 篇, 设置最大阅读数 {count} 篇",
+                            key,
                         )
                         return
                 else:
@@ -264,12 +273,12 @@ def read_articles(cookie, UA, keys, desc, count, acct_idx):
     # 任务执行完后发送总的阅读积分通知
     time.sleep(random.randint(1, 6))
     if total_gain == 0:
-        send_notification("退出", f"账号:{desc}\n{message}", keys)
+        send_notification("退出", f"账号[{desc}]{message}", key)
     else:
         send_notification(
             "阅读任务完成",
-            f"账号:{desc}\n此次总获得阅读积分：{total_gain}，今日阅读：{total_read} 篇，今日获取：{total_gold}，可提现钢镚：{total_remain}\n{message}",
-            keys,
+            f"账号[{desc}]此次总获得阅读积分：{total_gain}，今日阅读：{total_read} 篇，今日获取：{total_gold}，可提现钢镚：{total_remain}\n{message}",
+            key,
         )
 
 
@@ -278,10 +287,10 @@ def execute_accounts(account, index):
         cookie = account.get("Cookie")
         ua = account.get("UA")
         desc = account.get("desc")
-        keys = account.get("keys")
+        key = account.get("key")
         count = account.get("count")
         read_articles(
-            cookie=cookie, UA=ua, keys=keys, desc=desc, count=count, acct_idx=index
+            cookie=cookie, UA=ua, key=key, desc=desc, count=count, acct_idx=index
         )
     except Exception as e:
         log(f"发生运行时异常：{e}")
