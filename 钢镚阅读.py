@@ -1,6 +1,6 @@
 """
 活动地址: http://2956396.w.u5re46414.3l0mqnkypptv.cloud/?p=2956396
-脚本更新时间: 2023-12-13
+脚本更新时间: 2023-12-17
 抓包获取: Cookie，UserAgent。
 key参数为PushPlus推送加的token用于接收通知，配置示例:["通知key1", "通知key2", "通知key3"]有几个写几个。
 青龙脚本配置：请在环境变量配置GBYD_COOKIE，变量值为你抓取到的cookie与pushplus的token拼接，例如："cookie&pushplus=xxxxxx&desc=大号"，
