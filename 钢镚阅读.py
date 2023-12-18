@@ -9,7 +9,7 @@ desc是这个账号的描述, count是这个账号每天跑多少篇最大180。
 如果要推送discord请在配置文件里配置变量DISCORD_WEBHOOK_URL，例如
 export DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/idxxx/xxxxxxxxx"
 如果要推送telegram，也请在配置文件里配置好，与qinglong共用变量
-cron: */45 8-23 * * * 钢镚阅读.py
+cron: */30 8-23 * * * 钢镚阅读.py
 """
 import datetime
 import os
@@ -24,8 +24,17 @@ import json
 import emoji
 from concurrent.futures import ThreadPoolExecutor
 
-# gbyd_cookie = os.environ.get("GBYD_COOKIE")
-gbyd_cookie = "zzbb_info=%7B%22openid%22%3A%22oF1b14oJ4opUjWH9gvL41aS7CG9Y%22%2C%22pid%22%3A2920660%2C%22uid%22%3A2956396%7D; gfsessionid=o-0fIv-_HEjjSvRLtm52jWfPvQwg&pushplus=a97fdd804d3d4228a13451c2a5db948&desc=大号&&&zzbb_info=%7B%22openid%22%3A%22oF1b14uS_ZsXU2e_MfONor5QfLTU%22%2C%22pid%22%3A2956396%2C%22uid%22%3A2992011%7D; gfsessionid=o-0fIv_ZFL9yiUKmWVqSPzROyywc&pushplus=7a30cef08741413bbb4917e21d59b50a&desc=小尾巴&&&zzbb_info=%7B%22openid%22%3A%22oF1b14oosg-qpZHuVm5zKO8FH82o%22%2C%22pid%22%3A2956396%2C%22uid%22%3A2958186%7D; gfsessionid=o-0fIv3fe-9wsH9QYy7_d6iY_T_E&pushplus=54316a3958d64490813b390a99ea218e&desc=新新&&&zzbb_info=%7B%22openid%22%3A%22oF1b14pE_71bcj-3ZbUxGFha0L6o%22%2C%22pid%22%3A2956396%2C%22uid%22%3A2992378%7D; gfsessionid=o-0fIv4t7mYaU2Nl7wC9TxaMpfKg&pushplus=4f7bda4d77a245a2b7b56b1eb1552862&desc=申屠&&&zzbb_info=%7B%22openid%22%3A%22oF1b14tbV9COTosZko47q-Z3D2qQ%22%2C%22pid%22%3A2956396%2C%22uid%22%3A2993372%7D; gfsessionid=o-0fIv5alQLzLUEFYIoDgUaJp0Vo&pushplus=fae32cbbadf74c81a963ef7e9e6010a7&desc=小尾巴mom&&&zzbb_info=%7B%22openid%22%3A%22oF1b14kCdfFWRt5u4CpnVFPzg6tI%22%2C%22pid%22%3A2956396%2C%22uid%22%3A2993274%7D; gfsessionid=o-0fIv0alYj2-BeGFwig2FN6qokQ&pushplus=fae32cbbadf74c81a963ef7e9e6010a7&desc=Nemo"
+
+def log(message):
+    print(
+        emoji.emojize(
+            f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]}] {message}'
+        )
+    )
+
+
+gbyd_cookie = os.environ.get("GBYD_COOKIE")
+# gbyd_cookie = "zzbb_info=%7B%22openid%22%3A%22oF1b14oJ4opUjWH9gvL41aS7CG9Y%22%2C%22pid%22%3A2920660%2C%22uid%22%3A2956396%7D; gfsessionid=o-0fIv-_HEjjSvRLtm52jWfPvQwg&pushplus=a97fdd804d3d4228a13451c2a5db948&desc=大号&&&zzbb_info=%7B%22openid%22%3A%22oF1b14uS_ZsXU2e_MfONor5QfLTU%22%2C%22pid%22%3A2956396%2C%22uid%22%3A2992011%7D; gfsessionid=o-0fIv_ZFL9yiUKmWVqSPzROyywc&pushplus=7a30cef08741413bbb4917e21d59b50a&desc=小尾巴&&&zzbb_info=%7B%22openid%22%3A%22oF1b14oosg-qpZHuVm5zKO8FH82o%22%2C%22pid%22%3A2956396%2C%22uid%22%3A2958186%7D; gfsessionid=o-0fIv3fe-9wsH9QYy7_d6iY_T_E&pushplus=54316a3958d64490813b390a99ea218e&desc=新新&&&zzbb_info=%7B%22openid%22%3A%22oF1b14pE_71bcj-3ZbUxGFha0L6o%22%2C%22pid%22%3A2956396%2C%22uid%22%3A2992378%7D; gfsessionid=o-0fIv4t7mYaU2Nl7wC9TxaMpfKg&pushplus=4f7bda4d77a245a2b7b56b1eb1552862&desc=申屠&&&zzbb_info=%7B%22openid%22%3A%22oF1b14tbV9COTosZko47q-Z3D2qQ%22%2C%22pid%22%3A2956396%2C%22uid%22%3A2993372%7D; gfsessionid=o-0fIv5alQLzLUEFYIoDgUaJp0Vo&pushplus=fae32cbbadf74c81a963ef7e9e6010a7&desc=小尾巴mom&&&zzbb_info=%7B%22openid%22%3A%22oF1b14kCdfFWRt5u4CpnVFPzg6tI%22%2C%22pid%22%3A2956396%2C%22uid%22%3A2993274%7D; gfsessionid=o-0fIv0alYj2-BeGFwig2FN6qokQ&pushplus=fae32cbbadf74c81a963ef7e9e6010a7&desc=Nemo"
 
 # 按 "&&&" 分割成多个账号信息
 if type(gbyd_cookie) != str:
@@ -36,6 +45,7 @@ account_infos = gbyd_cookie.split("&&&")
 accounts_list = []
 
 # 遍历每个账号信息
+accounts_list_len = 0
 for account_info in account_infos:
     # 按 "&" 分割成多个字段
     fields = account_info.split("&")
@@ -49,8 +59,15 @@ for account_info in account_infos:
             "UA": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.44(0x18002c2b) NetType/WIFI Language/en",
             "count": 180,
         }
+        accounts_list_len += 1
         # 将账号字典添加到列表中
         accounts_list.append(account_dict)
+
+if len(accounts_list) < 1:
+    log("没有读取到账号")
+    sys.exit(0)
+else:
+    log(f"读取账号{accounts_list_len}个")
 
 check = [
     "MzkyMzI5NjgxMA==",
@@ -90,14 +107,6 @@ check = [
     "MjM5MDU4ODgwMw==",
     "Mzg4NzUyMjQxMw==",
 ]
-
-
-def log(message):
-    print(
-        emoji.emojize(
-            f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]}] {message}'
-        )
-    )
 
 
 def send_notification(title, content, key):
@@ -219,7 +228,11 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
         res = requests.get(url, headers=headers, timeout=7).json()
     except requests.Timeout:
         res = requests.get(url, headers=headers, timeout=7).json()
-    if res["data"]["read"] > count:
+    except Exception as e:
+        log(f"账号[{desc}]获取阅读信息时异常，稍后会重试：{e}")
+        time.sleep(random.randint(1, accounts_list_len * 2))
+        res = requests.get(url, headers=headers, timeout=7).json()
+    if res["data"]["read"] >= count:
         time.sleep(random.randint(1, 6))
         send_notification(
             "今日阅读已完成",
@@ -237,9 +250,11 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
             response = requests.get(url, headers=headers, json=data, timeout=7).json()
         except requests.Timeout:
             response = requests.get(url, headers=headers, json=data, timeout=7).json()
+        except Exception as e:
+            log(f"账号[{desc}]获取文章时异常，重试：{e}")
+            time.sleep(random.randint(1, accounts_list_len * 2))
         if response["code"] == 1:
             message = response["message"]
-            # await send_notification("退出", f"账号[{desc}]已退出！{response['message']}", key)
             break
         else:
             try:
@@ -253,10 +268,11 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
                 biz = link1.split("__biz=")[1].split("&")[0]
                 nickname = matches1.group(1) if matches1 else None
                 if biz in check:
-                    time.sleep(random.randint(1, 6))
+                    time.sleep(random.randint(1, 12))
                     send_notification(
                         "请处理检测文章", f"账号[{desc}]发现检测文章, 请手动阅读一篇，标题:{nickname}", key
                     )
+                    message = "遇到检测文章"
                     break  # 如果检测到文章，跳出循环
                 sleep = random.randint(23, 38)
                 time.sleep(sleep)
@@ -272,8 +288,8 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
                     except json.decoder.JSONDecodeError:
                         break
                     except Exception:
-                        log("阅读异常，随机几秒延后重试")
-                        time.sleep(random.randint(1, 10))
+                        log(f"账号[{desc}]阅读异常，随机几秒延后重试")
+                        time.sleep(random.randint(1, 12))
                         try:
                             response = requests.get(
                                 url, headers=headers, data=data, timeout=7
@@ -297,9 +313,9 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
                     remain = response["data"]["remain"]
                     total_remain = remain
                     log(
-                        f"账号[{desc}]第 {o + 1} 篇阅读成功--获得钢镚：{gain} :money_bag: ,今日阅读：{read} 篇--今日获取：{gold} :money_bag:,可提{remain} :money_bag:"
+                        f"账号[{desc}]本次第 {o + 1} 篇阅读成功--获得积分：{gain} :money_bag: ,今日阅读：{read} 篇--今日获取积分：{gold} :money_bag: ,可提现积分{remain} :money_bag: "
                     )
-                    if read > count:
+                    if read >= count:
                         time.sleep(random.randint(1, 6))
                         send_notification(
                             "退出",
@@ -319,7 +335,7 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
     else:
         send_notification(
             "本次阅读任务完成",
-            f"账号[{desc}]此次总获得阅读积分：{total_gain}，今日阅读：{total_read} 篇，今日获取：{total_gold} :money_bag:，可提现钢镚：{total_remain} :money_bag: \n{message}",
+            f"账号[{desc}]此次总共获得阅读积分：{total_gain}，今日阅读：{total_read} 篇，今日获取积分：{total_gold} :money_bag:，可提现积分：{total_remain} :money_bag: \n{message}",
             key,
         )
 
@@ -339,11 +355,8 @@ def execute_accounts(account, index):
         traceback.print_exc()  # 打印异常栈信息
 
 
-if len(accounts_list) < 1:
-    log("没有读取到账号")
-    sys.exit(0)
 # 使用线程池执行每个账号的任务
 with ThreadPoolExecutor(max_workers=len(accounts_list)) as executor:
     for index, account_info in enumerate(accounts_list, start=1):
         executor.submit(execute_accounts, account_info, index)
-        time.sleep(random.randint(1, 30))
+        time.sleep(random.randint(1, 2 * len(accounts_list)))
