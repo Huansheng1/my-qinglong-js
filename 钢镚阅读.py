@@ -124,7 +124,7 @@ def send_pushplus_notification(title, content, key):
         log("推送pushplus消息超时，重试")
         requests.post(pushplus_url, data=pushplus_data, timeout=10)
     except requests.RequestException as e:
-        log(f"推送异常：{e}")
+        log(f"推送pushplus异常")
         traceback.print_exc()
 
 
@@ -324,7 +324,7 @@ def execute_accounts(account, index):
             cookie=cookie, UA=ua, key=key, desc=desc, count=count, acct_idx=index
         )
     except Exception as e:
-        log(f"发生运行时异常：{e}")
+        log(f"账号阅读[{desc}]发生运行时异常")
         traceback.print_exc()  # 打印异常栈信息
 
 
