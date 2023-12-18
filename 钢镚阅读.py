@@ -9,7 +9,7 @@ desc是这个账号的描述, count是这个账号每天跑多少篇最大180。
 如果要推送discord请在配置文件里配置变量DISCORD_WEBHOOK_URL，例如
 export DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/idxxx/xxxxxxxxx"
 如果要推送telegram，也请在配置文件里配置好，与qinglong共用变量
-cron: */30 8-18 * * * 钢镚阅读.py
+cron: */45 8-23 * * * 钢镚阅读.py
 """
 import datetime
 import os
@@ -51,18 +51,42 @@ for account_info in account_infos:
         accounts_list.append(account_dict)
 
 check = [
+    "MzkyMzI5NjgxMA==",
     "MzkzMzI5NjQ3MA==",
-    "MzkzMzI5Njc0Nw==",
-    "MzkyMzI5NjgxMA==",
-    "MzkzMzI5Njc0Nw==",
-    "MzkyMzI5NjgxMA==",
-    "Mzg4NjY5NzE4NQ==",
-    "Mzg3NzY5Nzg0NQ==",
     "Mzg5NTU4MzEyNQ==",
+    "Mzg3NzY5Nzg0NQ==",
+    "MzU5OTgxNjg1Mg==",
+    "Mzg4OTY5Njg4Mw==",
     "MzI1ODcwNTgzNA==",
     "Mzg2NDY5NzU0Mw==",
+    "MzA4OTI3ODY4Mg=",
+    "MzAwNTIzNjYzNA==",
+    "Mzg4NjY5NzE4NQ==",
     "MzkwODI5NzQ4MQ==",
-    "MzU5OTgxNjg1Mg==",
+    "MzkzMzI5Njc0Nw==",
+    "Mzg5NDg5MDY3Ng==",
+    "MzA3MjMwMTYwOA==",
+    "MzkyNTM5OTc3OQ==",
+    "MjM5OTQ0NzI3Ng==",
+    "MzkwOTU3MDI1OA==",
+    "MzAwOTc2NDExMA==",
+    "MzA3OTI4MDMxMA==",
+    "MzkxNzI2ODcwMQ==",
+    "MzA3MDMxNzMzOA==",
+    "Mzg3NjAwODMwMg==",
+    "MzI3NDE2ODk1Nw==",
+    "MzIyMDMyNTMwMw==",
+    "MzIzMjY2NTMwNQ==",
+    "MzkxNzMwMjY5Mg==",
+    "MzA5Njg3MDk2Ng==",
+    "MzA5MzM1OTY2OQ==",
+    "MzA4NTQwNjc3OQ==",
+    "MjM5NTY5OTU0MQ==",
+    "MzU1NTc4OTg2Mw==",
+    "MzkwMzI0NjQ4Mw==",
+    "MzI3OTA2NDk0Nw==",
+    "MjM5MDU4ODgwMw==",
+    "Mzg4NzUyMjQxMw==",
 ]
 
 
@@ -95,12 +119,13 @@ def send_pushplus_notification(title, content, key):
     }
 
     try:
-        with requests.Session() as session:
-            session.post(pushplus_url, data=pushplus_data, timeout=10)
+        requests.post(pushplus_url, data=pushplus_data, timeout=10)
     except requests.Timeout:
-        pass
+        log("推送pushplus消息超时，重试")
+        requests.post(pushplus_url, data=pushplus_data, timeout=10)
     except requests.RequestException as e:
-        log("PushPlus推送时出错: {e}")
+        log(f"推送异常：{e}")
+        traceback.print_exc()
 
 
 def send_telegram_notification(title, content):
@@ -195,8 +220,8 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
     if res["data"]["read"] > count:
         time.sleep(random.randint(1, 6))
         send_notification(
-            "退出",
-            f"账号[{desc}]超过设置最大阅读数!, 当前阅读 {res['data']['read']} 篇, 设置最大阅读数 {count} 篇",
+            "今日阅读已完成",
+            f"账号[{desc}]今日阅读任务已达上限 {count} 篇",
             key,
         )
         return
@@ -228,7 +253,7 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
                 if biz in check:
                     time.sleep(random.randint(1, 6))
                     send_notification(
-                        "检测文章", f"账号[{desc}]发现检测文章, 请手动阅读一篇，标题:{nickname}", key
+                        "请处理检测文章", f"账号[{desc}]发现检测文章, 请手动阅读一篇，标题:{nickname}", key
                     )
                     break  # 如果检测到文章，跳出循环
                 sleep = random.randint(23, 38)
@@ -278,11 +303,12 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
     # 任务执行完后发送总的阅读积分通知
     time.sleep(random.randint(1, 6))
     if total_gain == 0:
-        send_notification("退出", f"账号[{desc}]{message}", key)
+        # send_notification("退出", f"账号[{desc}]{message}", key)
+        log(f"账号[{desc}]退出：{message}")
     else:
         send_notification(
-            "阅读任务完成",
-            f"账号[{desc}]此次总获得阅读积分：{total_gain}，今日阅读：{total_read} 篇，今日获取：{total_gold}，可提现钢镚：{total_remain}\n{message}",
+            "本次阅读任务完成",
+            f"账号[{desc}]此次总获得阅读积分：{total_gain}，今日阅读：{total_read} 篇，今日获取：{total_gold} :money_bag:，可提现钢镚：{total_remain} :money_bag: \n{message}",
             key,
         )
 
