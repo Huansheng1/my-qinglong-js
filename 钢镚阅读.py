@@ -150,7 +150,7 @@ def send_telegram_notification(title, content):
     telegram_url = f"https://api.telegram.org/bot{telegram_bot_token}/sendMessage"
     telegram_params = {
         "chat_id": telegram_chat_id,
-        "text": content,
+        "text": emoji.emojize(content),
         "parse_mode": "Markdown",
     }
 
@@ -171,7 +171,7 @@ def send_discord_notification(title, content):
         log("Discord Webhook URL缺失。跳过发送Discord通知。")
         return
 
-    discord_data = {"content": content, "username": title}
+    discord_data = {"content": emoji.emojize(content), "username": title}
 
     try:
         response = requests.post(discord_webhook_url, json=discord_data, timeout=10)
@@ -236,11 +236,7 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
         res = requests.get(url, headers=headers, timeout=7).json()
     if res["data"]["read"] >= count:
         time.sleep(random.randint(1, 6))
-        send_notification(
-            "今日阅读已完成",
-            f"账号[{desc}]今日阅读任务已达上限 {count} 篇",
-            key,
-        )
+        log(f"账号[{desc}]今日阅读任务已完成，已达上限 {count} 篇")
         return
     # 本次阅读任务计数
     read_cnt = 0
@@ -333,8 +329,8 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
                     if read >= count:
                         time.sleep(random.randint(1, 6))
                         send_notification(
-                            "退出",
-                            f"账号[{desc}]超过设置最大阅读数!, 当前阅读 {read} 篇, 设置最大阅读数 {count} 篇",
+                            "今日阅读任务已完成",
+                            f"账号[{desc}]今日已达最大阅读数, 当前阅读 {read} 篇, 当日最大阅读数 {count} 篇",
                             key,
                         )
                         return
