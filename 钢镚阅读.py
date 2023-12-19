@@ -32,9 +32,8 @@ def log(message):
         )
     )
 
-
+# 从环境变量里取账号
 gbyd_cookie = os.environ.get("GBYD_COOKIE")
-# gbyd_cookie = "zzbb_info=%7B%22openid%22%3A%22oF1b14oJ4opUjWH9gvL41aS7CG9Y%22%2C%22pid%22%3A2920660%2C%22uid%22%3A2956396%7D; gfsessionid=o-0fIv-_HEjjSvRLtm52jWfPvQwg&pushplus=a97fdd804d3d4228a13451c2a5db948&desc=大号&&&zzbb_info=%7B%22openid%22%3A%22oF1b14uS_ZsXU2e_MfONor5QfLTU%22%2C%22pid%22%3A2956396%2C%22uid%22%3A2992011%7D; gfsessionid=o-0fIv_ZFL9yiUKmWVqSPzROyywc&pushplus=7a30cef08741413bbb4917e21d59b50a&desc=小尾巴&&&zzbb_info=%7B%22openid%22%3A%22oF1b14oosg-qpZHuVm5zKO8FH82o%22%2C%22pid%22%3A2956396%2C%22uid%22%3A2958186%7D; gfsessionid=o-0fIv3fe-9wsH9QYy7_d6iY_T_E&pushplus=54316a3958d64490813b390a99ea218e&desc=新新&&&zzbb_info=%7B%22openid%22%3A%22oF1b14pE_71bcj-3ZbUxGFha0L6o%22%2C%22pid%22%3A2956396%2C%22uid%22%3A2992378%7D; gfsessionid=o-0fIv4t7mYaU2Nl7wC9TxaMpfKg&pushplus=4f7bda4d77a245a2b7b56b1eb1552862&desc=申屠&&&zzbb_info=%7B%22openid%22%3A%22oF1b14tbV9COTosZko47q-Z3D2qQ%22%2C%22pid%22%3A2956396%2C%22uid%22%3A2993372%7D; gfsessionid=o-0fIv5alQLzLUEFYIoDgUaJp0Vo&pushplus=fae32cbbadf74c81a963ef7e9e6010a7&desc=小尾巴mom&&&zzbb_info=%7B%22openid%22%3A%22oF1b14kCdfFWRt5u4CpnVFPzg6tI%22%2C%22pid%22%3A2956396%2C%22uid%22%3A2993274%7D; gfsessionid=o-0fIv0alYj2-BeGFwig2FN6qokQ&pushplus=fae32cbbadf74c81a963ef7e9e6010a7&desc=Nemo"
 
 # 按 "&&&" 分割成多个账号信息
 if type(gbyd_cookie) != str:
