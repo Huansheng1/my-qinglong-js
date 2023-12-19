@@ -67,7 +67,9 @@ if len(accounts_list) < 1:
     log("没有读取到账号")
     sys.exit(0)
 else:
-    log(f"读取账号{accounts_list_len}个")
+    print(
+        log(f"读取账号{accounts_list_len}个，分别是: {', '.join(account['desc'] for account in accounts_list)}")
+    )
 
 check = [
     "MzkyMzI5NjgxMA==",
