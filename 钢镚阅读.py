@@ -158,9 +158,10 @@ def send_telegram_notification(title, content):
         response = requests.post(telegram_url, params=telegram_params, timeout=10)
         response.raise_for_status()
     except requests.Timeout:
+        log(f"发送Telegram超时")
         pass
     except requests.RequestException as e:
-        log("发送Telegram通知时出错: {e}")
+        log(f"发送Telegram通知时出错: {e}")
 
 
 def send_discord_notification(title, content):
@@ -176,9 +177,10 @@ def send_discord_notification(title, content):
         response = requests.post(discord_webhook_url, json=discord_data, timeout=10)
         response.raise_for_status()
     except requests.Timeout:
+        log(f"发送Discord通知超时")
         pass
     except requests.RequestException as e:
-        log("发送Discord通知时出错: {e}")
+        log(f"发送Discord通知时出错: {e}")
 
 
 # 示例用法：
