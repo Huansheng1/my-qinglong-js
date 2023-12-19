@@ -136,7 +136,7 @@ def send_pushplus_notification(title, content, key):
     except requests.Timeout:
         log("推送pushplus消息超时，重试")
         requests.post(pushplus_url, data=pushplus_data, timeout=10)
-    except requests.RequestException as e:
+    except Exception as e:
         log(f"推送pushplus异常")
         traceback.print_exc()
 
