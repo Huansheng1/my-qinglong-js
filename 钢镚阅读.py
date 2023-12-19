@@ -352,7 +352,7 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
     else:
         send_notification(
             "本次阅读任务完成",
-            f"账号[{desc}]此次总共获得阅读积分：{total_gain}，今日阅读：{total_read} 篇，今日获取积分：{total_gold} :money_bag:，可提现积分：{total_remain} :money_bag: \n{message}",
+            f"账号[{desc}]此次总共阅读文章[{o + 1}]篇，获得积分：{total_gain}，今日阅读：{total_read} 篇，获得积分：{total_gold} :money_bag: ，可提现积分：{total_remain} :money_bag: \n{message}",
             key,
         )
 
