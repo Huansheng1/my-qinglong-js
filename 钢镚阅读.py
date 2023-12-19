@@ -213,7 +213,7 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
                 share_links[0], headers=headers, allow_redirects=False
             )
         except Exception:
-            log(f"账号[{desc}]获取阅读链接时异常，重试")
+            log(f"账号[{desc}]获取阅读分享链接时异常，重试")
             time.sleep(random.randint(1, accounts_list_len * 2))
             response = requests.get(
                 share_links[0], headers=headers, allow_redirects=False
