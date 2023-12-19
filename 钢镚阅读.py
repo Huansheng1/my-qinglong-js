@@ -208,13 +208,22 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
         share_links = response["data"]["share_link"]
         p_value = share_links[0].split("=")[1].split("&")[0]
         headers = {"User-Agent": UA}
-        response = requests.get(share_links[0], headers=headers, allow_redirects=False)
+        try:
+            response = requests.get(
+                share_links[0], headers=headers, allow_redirects=False
+            )
+        except Exception:
+            log(f"账号[{desc}]获取阅读链接时异常，重试")
+            time.sleep(random.randint(1, accounts_list_len * 2))
+            response = requests.get(
+                share_links[0], headers=headers, allow_redirects=False
+            )
         url1 = response.headers["Location"]
         pattern = r"http://([^/]+)"
         match = re.search(pattern, url1)
         host = match.group(1)
     else:
-        time.sleep(random.randint(1, 6))
+        time.sleep(random.randint(1, accounts_list_len))
         send_notification("error", f"{response['message']}", key)
         return
     total_gain = 0  # 记录总的阅读积分
