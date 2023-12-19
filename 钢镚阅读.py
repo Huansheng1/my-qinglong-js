@@ -56,7 +56,7 @@ for account_info in account_infos:
             "Cookie": fields[0],
             "key": fields[1].split("=")[-1],  # 获取key字段的值
             "desc": fields[2].split("=")[-1],  # 获取desc字段的值
-            "UA": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.44(0x18002c2b) NetType/WIFI Language/en",
+            "UA": f"Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.44(acct_{accounts_list_len + 1}) NetType/WIFI Language/en",
             "count": 180,
         }
         accounts_list_len += 1
