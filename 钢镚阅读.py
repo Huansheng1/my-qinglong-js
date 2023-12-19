@@ -32,6 +32,7 @@ def log(message):
         )
     )
 
+
 # 从环境变量里取账号
 gbyd_cookie = os.environ.get("GBYD_COOKIE")
 
@@ -228,7 +229,7 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
     except requests.Timeout:
         res = requests.get(url, headers=headers, timeout=7).json()
     except Exception as e:
-        log(f"账号[{desc}]获取阅读信息时异常，稍后会重试：{e}")
+        log(f"账号[{desc}]获取阅读信息时异常，重试：{e}")
         time.sleep(random.randint(1, accounts_list_len * 2))
         res = requests.get(url, headers=headers, timeout=7).json()
     if res["data"]["read"] >= count:
@@ -239,6 +240,8 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
             key,
         )
         return
+    # 本次阅读任务计数
+    read_cnt = 0
     for o in range(30):
         sign, current_time = calculate_sign()
         url = f"http://{host}/read/task"
@@ -250,15 +253,25 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
         except requests.Timeout:
             response = requests.get(url, headers=headers, json=data, timeout=7).json()
         except Exception as e:
-            log(f"账号[{desc}]获取文章时异常，重试：{e}")
+            log(f"账号[{desc}]获取文章链接时异常，重试：{e}")
             time.sleep(random.randint(1, accounts_list_len * 2))
-        if response["code"] == 1:
+            response = requests.get(url, headers=headers, json=data, timeout=7).json()
+        if response["code"] != 0:
             message = response["message"]
             break
         else:
             try:
                 link = response["data"]["link"]
-                response = requests.get(link, headers=headers, allow_redirects=False)
+                try:
+                    response = requests.get(
+                        link, headers=headers, allow_redirects=False
+                    )
+                except Exception as e:
+                    log(f"账号[{desc}]读取文章时异常，重试：{e}")
+                    time.sleep(random.randint(1, accounts_list_len * 2))
+                    response = requests.get(
+                        link, headers=headers, allow_redirects=False
+                    )
                 link1 = response.headers["Location"]
                 response = requests.get(url=link1, headers=headers).text
                 pattern = r'<meta\s+property="og:url"\s+content="([^"]+)"\s*/>'
@@ -287,7 +300,7 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
                     except json.decoder.JSONDecodeError:
                         break
                     except Exception:
-                        log(f"账号[{desc}]阅读异常，随机几秒延后重试")
+                        log(f"账号[{desc}]阅读文章异常，随机几秒延后重试")
                         time.sleep(random.randint(1, 12))
                         try:
                             response = requests.get(
@@ -311,6 +324,7 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
                     total_gold = gold
                     remain = response["data"]["remain"]
                     total_remain = remain
+                    read_cnt += 1
                     log(
                         f"账号[{desc}]本次第 {o + 1} 篇阅读成功--获得积分：{gain} :money_bag: ,今日阅读：{read} 篇--今日获取积分：{gold} :money_bag: ,可提现积分{remain} :money_bag: "
                     )
@@ -324,8 +338,12 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
                         return
                 else:
                     break
-            except KeyError:
+            except KeyError as ke:
+                log(f"账号[{desc}]阅读时KeyError异常，退出本次阅读: {ke}")
                 break
+            except Exception as reade:
+                log(f"账号[{desc}]执行第[{o + 1}]篇阅读任务发生未知异常，继续阅读任务")
+                pass
     # 任务执行完后发送总的阅读积分通知
     time.sleep(random.randint(1, 6))
     if total_gain == 0:
@@ -349,8 +367,8 @@ def execute_accounts(account, index):
         read_articles(
             cookie=cookie, UA=ua, key=key, desc=desc, count=count, acct_idx=index
         )
-    except Exception as e:
-        log(f"账号阅读[{desc}]发生运行时异常")
+    except Exception:
+        log(f"账号[{desc}]阅读发生运行时未知异常")
         traceback.print_exc()  # 打印异常栈信息
 
 
