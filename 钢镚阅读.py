@@ -110,7 +110,7 @@ check = [
 
 
 def send_notification(title, content, key):
-    log(content)
+    log(f"[{title}]: {content}")
     # 发送到pushplus
     send_pushplus_notification(title, content, key)
     # 发送tg
@@ -292,7 +292,7 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
                     )
                     message = "遇到检测文章,结束本次阅读任务"
                     break  # 如果检测到文章，跳出循环
-                sleep = random.randint(23, 38)
+                sleep = random.randint(accounts_list_len * 2, accounts_list_len * 4)
                 time.sleep(sleep)
                 sign, current_time = calculate_sign()
                 url = f"http://{host}/read/finish"
@@ -304,6 +304,8 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
                             url, headers=headers, data=data, timeout=7
                         ).json()
                     except json.decoder.JSONDecodeError:
+                        log(f"账号[{desc}]阅读文章结果异常1：{jde}")
+                        message = f"账号[{desc}]阅读文章结果异常1：{jde}"
                         break
                     except Exception as e:
                         log(f"账号[{desc}]阅读文章异常，随机几秒延后重试,{e}")
@@ -312,7 +314,9 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
                             response = requests.get(
                                 url, headers=headers, data=data, timeout=7
                             ).json()
-                        except json.decoder.JSONDecodeError:
+                        except json.decoder.JSONDecodeError as jde:
+                            log(f"账号[{desc}]阅读文章结果异常2：{jde}")
+                            message = f"账号[{desc}]阅读文章结果异常2：{jde}"
                             break
                 except requests.Timeout:
                     try:
@@ -320,6 +324,8 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
                             url, headers=headers, data=data, timeout=7
                         ).json()
                     except json.decoder.JSONDecodeError:
+                        log(f"账号[{desc}]阅读文章结果异常3：{jde}")
+                        message = f"账号[{desc}]阅读文章结果异常3：{jde}"
                         break
                 if response["code"] == 0:
                     gain = response["data"]["gain"]
@@ -330,12 +336,12 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
                     total_gold = gold
                     remain = response["data"]["remain"]
                     total_remain = remain
-                    read_cnt += 1
                     log(
                         f"账号[{desc}]本次第 {o + 1} 篇阅读成功--获得积分：{gain} :money_bag: ,今日阅读：{read} 篇--今日获取积分：{gold} :money_bag: ,可提现积分{remain} :money_bag: "
                     )
+                    read_cnt += 1
                     if read >= count:
-                        time.sleep(random.randint(1, 6))
+                        time.sleep(random.randint(1, accounts_list_len))
                         send_notification(
                             "今日阅读任务已完成",
                             f"账号[{desc}]今日已达最大阅读数, 当前阅读 {read} 篇, 当日最大阅读数 {count} 篇",
