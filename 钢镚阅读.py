@@ -235,7 +235,6 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
         time.sleep(random.randint(1, accounts_list_len * 2))
         res = requests.get(url, headers=headers, timeout=7).json()
     if res["data"]["read"] >= count:
-        time.sleep(random.randint(1, 6))
         log(f"账号[{desc}]今日阅读任务已完成，已达上限 {count} 篇")
         return
     # 本次阅读任务计数
