@@ -286,7 +286,7 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
                     send_notification(
                         "请处理检测文章", f"账号[{desc}]发现检测文章, 请手动阅读一篇，标题:{nickname}", key
                     )
-                    message = "遇到检测文章"
+                    message = "遇到检测文章,结束本次阅读任务"
                     break  # 如果检测到文章，跳出循环
                 sleep = random.randint(23, 38)
                 time.sleep(sleep)
@@ -301,9 +301,9 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
                         ).json()
                     except json.decoder.JSONDecodeError:
                         break
-                    except Exception:
-                        log(f"账号[{desc}]阅读文章异常，随机几秒延后重试")
-                        time.sleep(random.randint(1, 12))
+                    except Exception as e:
+                        log(f"账号[{desc}]阅读文章异常，随机几秒延后重试,{e}")
+                        time.sleep(random.randint(1, accounts_list_len))
                         try:
                             response = requests.get(
                                 url, headers=headers, data=data, timeout=7
@@ -347,14 +347,16 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
                 log(f"账号[{desc}]执行第[{o + 1}]篇阅读任务发生未知异常，继续阅读任务")
                 pass
     # 任务执行完后发送总的阅读积分通知
-    time.sleep(random.randint(1, 6))
+    time.sleep(random.randint(1, accounts_list_len))
     if total_gain == 0:
         # send_notification("退出", f"账号[{desc}]{message}", key)
         log(f"账号[{desc}]退出：{message}")
     else:
+        if len(message) >= 1:
+            log(message)
         send_notification(
             "本次阅读任务完成",
-            f"账号[{desc}]此次总共阅读文章[{o + 1}]篇，获得积分：{total_gain}，今日阅读：{total_read} 篇，获得积分：{total_gold} :money_bag: ，可提现积分：{total_remain} :money_bag: \n{message}",
+            f"账号[{desc}]此次总共阅读文章[{o + 1}]篇，获得积分：{total_gain}，今日阅读：{total_read} 篇，获得积分：{total_gold} :money_bag: ，可提现积分：{total_remain} :money_bag: ",
             key,
         )
 
