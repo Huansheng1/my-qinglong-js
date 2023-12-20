@@ -227,7 +227,7 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
     data = {"time": current_time, "sign": sign}
     try:
         response = requests.get(url, headers=headers, json=data).json()
-    except Exception:
+    except Exception as e:
         log(f"账号[{desc}]签到异常，重试：{e}")
         time.sleep(random.randint(1, accounts_list_len * 2))
         response = requests.get(url, headers=headers, json=data).json()
