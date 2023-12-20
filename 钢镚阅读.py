@@ -23,6 +23,7 @@ import requests
 import json
 import emoji
 from concurrent.futures import ThreadPoolExecutor
+from retrying import retry
 
 
 def log(message):
@@ -67,9 +68,7 @@ if len(accounts_list) < 1:
     log("没有读取到账号")
     sys.exit(0)
 else:
-    log(
-        f"读取账号{accounts_list_len}个，分别是: {', '.join(account['desc'] for account in accounts_list)}"
-    )
+    log(f"读取账号{accounts_list_len}个")
 
 check = [
     "MzkyMzI5NjgxMA==",
@@ -112,7 +111,7 @@ check = [
 
 
 def send_notification(title, content, key):
-    log(f"[{title}]: {content}")
+    log(content)
     # 发送到pushplus
     send_pushplus_notification(title, content, key)
     # 发送tg
@@ -121,6 +120,10 @@ def send_notification(title, content, key):
     send_discord_notification(title, content)
 
 
+# 最大重试次数  # 重试间隔（毫秒）
+@retry(
+    stop_max_attempt_number=3, wait_fixed=random.randint(1, accounts_list_len * 1000)
+)
 def send_pushplus_notification(title, content, key):
     pushplus_url = "http://www.pushplus.plus/send"
     content += f', 事件ID：{datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")[:-3]}'
@@ -136,11 +139,15 @@ def send_pushplus_notification(title, content, key):
     except requests.Timeout:
         log("推送pushplus消息超时，重试")
         requests.post(pushplus_url, data=pushplus_data, timeout=10)
-    except Exception as e:
+    except requests.RequestException as e:
         log(f"推送pushplus异常")
         traceback.print_exc()
 
 
+# 最大重试次数  # 重试间隔（毫秒）
+@retry(
+    stop_max_attempt_number=3, wait_fixed=random.randint(1, accounts_list_len * 1000)
+)
 def send_telegram_notification(title, content):
     telegram_bot_token = os.environ.get("TG_BOT_TOKEN")
     telegram_chat_id = os.environ.get("TG_USER_ID")
@@ -166,6 +173,10 @@ def send_telegram_notification(title, content):
         log(f"发送Telegram通知时出错: {e}")
 
 
+# 最大重试次数  # 重试间隔（毫秒）
+@retry(
+    stop_max_attempt_number=3, wait_fixed=random.randint(1, accounts_list_len * 1000)
+)
 def send_discord_notification(title, content):
     discord_webhook_url = os.environ.get("DISCORD_WEBHOOK_URL")
 
@@ -196,6 +207,10 @@ def calculate_sign():
     return sha256_hash.hexdigest(), current_time
 
 
+# 最大重试次数  # 重试间隔（毫秒）
+@retry(
+    stop_max_attempt_number=3, wait_fixed=random.randint(1, accounts_list_len * 1000)
+)
 def read_articles(cookie, UA, key, desc, count, acct_idx):
     if not cookie:
         log(f"账号[{desc}]未获取到cookie")
@@ -210,22 +225,13 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
         share_links = response["data"]["share_link"]
         p_value = share_links[0].split("=")[1].split("&")[0]
         headers = {"User-Agent": UA}
-        try:
-            response = requests.get(
-                share_links[0], headers=headers, allow_redirects=False
-            )
-        except Exception:
-            log(f"账号[{desc}]获取阅读分享链接时异常，重试")
-            time.sleep(random.randint(1, accounts_list_len * 2))
-            response = requests.get(
-                share_links[0], headers=headers, allow_redirects=False
-            )
+        response = requests.get(share_links[0], headers=headers, allow_redirects=False)
         url1 = response.headers["Location"]
         pattern = r"http://([^/]+)"
         match = re.search(pattern, url1)
         host = match.group(1)
     else:
-        time.sleep(random.randint(1, accounts_list_len))
+        time.sleep(random.randint(1, 6))
         send_notification("error", f"{response['message']}", key)
         return
     total_gain = 0  # 记录总的阅读积分
@@ -246,6 +252,7 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
         time.sleep(random.randint(1, accounts_list_len * 2))
         res = requests.get(url, headers=headers, timeout=7).json()
     if res["data"]["read"] >= count:
+        time.sleep(random.randint(1, 6))
         log(f"账号[{desc}]今日阅读任务已完成，已达上限 {count} 篇")
         return
     # 本次阅读任务计数
@@ -294,7 +301,7 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
                     )
                     message = "遇到检测文章,结束本次阅读任务"
                     break  # 如果检测到文章，跳出循环
-                sleep = random.randint(accounts_list_len * 2, accounts_list_len * 4)
+                sleep = random.randint(23, 38)
                 time.sleep(sleep)
                 sign, current_time = calculate_sign()
                 url = f"http://{host}/read/finish"
@@ -306,8 +313,6 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
                             url, headers=headers, data=data, timeout=7
                         ).json()
                     except json.decoder.JSONDecodeError:
-                        log(f"账号[{desc}]阅读文章结果异常1：{jde}")
-                        message = f"账号[{desc}]阅读文章结果异常1：{jde}"
                         break
                     except Exception as e:
                         log(f"账号[{desc}]阅读文章异常，随机几秒延后重试,{e}")
@@ -316,9 +321,7 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
                             response = requests.get(
                                 url, headers=headers, data=data, timeout=7
                             ).json()
-                        except json.decoder.JSONDecodeError as jde:
-                            log(f"账号[{desc}]阅读文章结果异常2：{jde}")
-                            message = f"账号[{desc}]阅读文章结果异常2：{jde}"
+                        except json.decoder.JSONDecodeError:
                             break
                 except requests.Timeout:
                     try:
@@ -326,8 +329,6 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
                             url, headers=headers, data=data, timeout=7
                         ).json()
                     except json.decoder.JSONDecodeError:
-                        log(f"账号[{desc}]阅读文章结果异常3：{jde}")
-                        message = f"账号[{desc}]阅读文章结果异常3：{jde}"
                         break
                 if response["code"] == 0:
                     gain = response["data"]["gain"]
@@ -338,12 +339,12 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
                     total_gold = gold
                     remain = response["data"]["remain"]
                     total_remain = remain
+                    read_cnt += 1
                     log(
                         f"账号[{desc}]本次第 {o + 1} 篇阅读成功--获得积分：{gain} :money_bag: ,今日阅读：{read} 篇--今日获取积分：{gold} :money_bag: ,可提现积分{remain} :money_bag: "
                     )
-                    read_cnt += 1
                     if read >= count:
-                        time.sleep(random.randint(1, accounts_list_len))
+                        time.sleep(random.randint(1, 6))
                         send_notification(
                             "今日阅读任务已完成",
                             f"账号[{desc}]今日已达最大阅读数, 当前阅读 {read} 篇, 当日最大阅读数 {count} 篇",
