@@ -12,6 +12,7 @@ export DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/idxxx/xxxxxxxxx"
 cron: */30 8-23 * * * 钢镚阅读.py
 """
 import datetime
+import http.client
 import os
 import random
 import hashlib
@@ -122,7 +123,7 @@ def send_notification(title, content, key):
 
 # 最大重试次数  # 重试间隔（毫秒）
 @retry(
-    stop_max_attempt_number=3, wait_fixed=random.randint(1, accounts_list_len * 1000)
+    stop_max_attempt_number=3, wait_fixed=random.randint(1000, accounts_list_len * 1000)
 )
 def send_pushplus_notification(title, content, key):
     pushplus_url = "http://www.pushplus.plus/send"
@@ -146,7 +147,7 @@ def send_pushplus_notification(title, content, key):
 
 # 最大重试次数  # 重试间隔（毫秒）
 @retry(
-    stop_max_attempt_number=3, wait_fixed=random.randint(1, accounts_list_len * 1000)
+    stop_max_attempt_number=3, wait_fixed=random.randint(1000, accounts_list_len * 1000)
 )
 def send_telegram_notification(title, content):
     telegram_bot_token = os.environ.get("TG_BOT_TOKEN")
@@ -175,7 +176,7 @@ def send_telegram_notification(title, content):
 
 # 最大重试次数  # 重试间隔（毫秒）
 @retry(
-    stop_max_attempt_number=3, wait_fixed=random.randint(1, accounts_list_len * 1000)
+    stop_max_attempt_number=3, wait_fixed=random.randint(1000, accounts_list_len * 1000)
 )
 def send_discord_notification(title, content):
     discord_webhook_url = os.environ.get("DISCORD_WEBHOOK_URL")
@@ -209,7 +210,11 @@ def calculate_sign():
 
 # 最大重试次数  # 重试间隔（毫秒）
 @retry(
-    stop_max_attempt_number=3, wait_fixed=random.randint(1, accounts_list_len * 1000)
+    stop_max_attempt_number=3,
+    wait_fixed=random.randint(1000, accounts_list_len * 1000),
+    retry_on_exception=lambda ex: isinstance(
+        ex, (requests.exceptions.RequestException, http.client.RemoteDisconnected)
+    ),
 )
 def read_articles(cookie, UA, key, desc, count, acct_idx):
     if not cookie:
