@@ -225,7 +225,12 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
     headers = {"User-Agent": UA, "Cookie": cookie}
     sign, current_time = calculate_sign()
     data = {"time": current_time, "sign": sign}
-    response = requests.get(url, headers=headers, json=data).json()
+    try:
+        response = requests.get(url, headers=headers, json=data).json()
+    except Exception:
+        log(f"账号[{desc}]签到异常，重试：{e}")
+        time.sleep(random.randint(1, accounts_list_len * 2))
+        response = requests.get(url, headers=headers, json=data).json()
     if response["code"] == 0:
         share_links = response["data"]["share_link"]
         p_value = share_links[0].split("=")[1].split("&")[0]
