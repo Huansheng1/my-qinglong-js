@@ -7,7 +7,7 @@ key参数为PushPlus推送加的token用于接收通知，配置示例:["通知k
 如果多个账号请用'&&&'隔开，例如："cookie1&pushplus=11111&desc=大号&&&cookie2&pushplus=22222&desc=小号1"
 desc是这个账号的描述, count是这个账号每天跑多少篇最大180。
 如果要推送discord请在配置文件里配置变量DISCORD_WEBHOOK_URL，例如
-export DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/idxxx/xxxxxxxxx"
+export GBYD_DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/idxxx/xxxxxxxxx"
 如果要推送telegram，也请在配置文件里配置好，与qinglong共用变量
 cron: */30 8-23 * * * 钢镚阅读.py
 """
@@ -179,7 +179,7 @@ def send_telegram_notification(title, content):
     stop_max_attempt_number=3, wait_fixed=random.randint(1000, accounts_list_len * 1000)
 )
 def send_discord_notification(title, content):
-    discord_webhook_url = os.environ.get("DISCORD_WEBHOOK_URL")
+    discord_webhook_url = os.environ.get("GBYD_DISCORD_WEBHOOK_URL")
 
     if not discord_webhook_url:
         log("Discord Webhook URL缺失。跳过发送Discord通知。")
@@ -357,7 +357,7 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
                         time.sleep(random.randint(1, 6))
                         send_notification(
                             "今日阅读任务已完成",
-                            f"账号[{desc}]今日已达最大阅读数, 当前阅读 {read} 篇, 当日最大阅读数 {count} 篇",
+                            f"账号[{desc}]今日已达最大阅读数 {count} 篇",
                             key,
                         )
                         return
@@ -377,7 +377,7 @@ def read_articles(cookie, UA, key, desc, count, acct_idx):
     else:
         send_notification(
             "本次阅读任务完成",
-            f"账号[{desc}]此次总共阅读文章[{o + 1}]篇，获得积分：{total_gain}，今日阅读：{total_read} 篇，获得积分：{total_gold} :money_bag: ，可提现积分：{total_remain} :money_bag: \n{message}",
+            f"账号[{desc}]此次总共阅读文章[{read_cnt}]篇，获得积分：{total_gain}，今日阅读：{total_read} 篇，获得积分：{total_gold} :money_bag: ，可提现积分：{total_remain} :money_bag: \n{message}",
             key,
         )
 
