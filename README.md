@@ -53,8 +53,11 @@ ql repo https://github.com/Huansheng1/my-qinglong-js.git "" "sendNotify.js|utils
 
 ### 代理推荐
 
-* [星空代理](https://raw.githubusercontent.com/Huansheng1/my-qinglong-js/main/%E6%98%9F%E7%A9%BA%E4%BB%A3%E7%90%86%E7%AD%BE%E5%88%B0.py)  注册地址：[点我前往](http://www.xkdaili.com/?ic=7d6acs0s)
-* [品赞HTTP代理](https://raw.githubusercontent.com/Huansheng1/my-qinglong-js/main/%E5%93%81%E8%B5%9EHTTP%E4%BB%A3%E7%90%86%E7%AD%BE%E5%88%B0.js)  注册地址：[点我前往](https://www.ipzan.com?pid=oviuk6128)
+* [星空代理](https://raw.githubusercontent.com/Huansheng1/my-qinglong-js/main/%E6%98%9F%E7%A9%BA%E4%BB%A3%E7%90%86%E7%AD%BE%E5%88%B0.py)  注册地址：[点我前往](http://www.xkdaili.com/?ic=7d6acs0s)   ---- 脚本自动签到领取星币，兑换IP
+* [品赞HTTP代理](https://raw.githubusercontent.com/Huansheng1/my-qinglong-js/main/%E5%93%81%E8%B5%9EHTTP%E4%BB%A3%E7%90%86%E7%AD%BE%E5%88%B0.js)  注册地址：[点我前往](https://www.ipzan.com?pid=oviuk6128)   ---- 脚本自动签到领取金币，兑换IP
+* 品易HTTP代理  注册地址：[点我前往](https://http.py.cn?invitation_code=UHtTSH4ibUN0TgEPWkF1TwwEf0wFd0RZRQEgJTZyeXU7AhsnBjo=)   ---- 注册实名送1个G流量，不按IP次数收费，在提取IP频繁但是流量不大的情况下非常划算
+* 携趣HTTP代理  注册地址：[点我前往](https://www.xiequ.cn/)   ---- 注册实名，每日赠送有效时长为30秒的1000个高匿IP
+* 巨量HTTP代理  注册地址：[点我前往](https://www.juliangip.com/user/reg?inviteCode=1026195)   ---- 注册实名，每日赠送有效时长为1000个代理IP
 
 ### 报错提示
 1. `/ql/data/config/config.sh: line xxx`：`这种基本都是配置文件里的数据配错了，导致qinglong读取环境变量直接崩了，请检查是否多了空格或者格式不合法`
