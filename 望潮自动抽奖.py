@@ -3,7 +3,7 @@ author: 不知道是谁啊
 cron: 2 8 * * *
 new Env('望潮自动抽奖')
 
-望潮自动抽奖版本 V1.20
+望潮自动抽奖魔改版 V1.20
 环境变量 wangchao_data 多号@分割
 ck格式 手机号#密码 或者 sessionId#accountId
 """
