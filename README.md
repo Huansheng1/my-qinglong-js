@@ -27,7 +27,7 @@
 ## 公告
 > 自写 + 自用 的他人脚本
 
-不定期更新，有问题提issue描述清楚，避免浪费大家时间；或者 进群 -  [通知群](https://t.me/huan_sheng) 
+不定期更新，有问题提issue描述清楚，避免浪费大家时间
 
 ### 青龙拉取
 > 先安装nodejs依赖：
@@ -47,9 +47,14 @@ ql repo https://github.com/Huansheng1/my-qinglong-js.git "" "sendNotify.js|utils
 
 见各个脚本 头部描述
 
-### 投稿说明
+### 交流渠道
 
-请前往 [discussions](https://github.com/Huansheng1/my-qinglong-js/discussions/2) 查看要求，按说明投递
+* [学习交流](https://t.me/huan_sheng)
+
+### 代理推荐
+
+* [星空代理](https://raw.githubusercontent.com/Huansheng1/my-qinglong-js/main/%E6%98%9F%E7%A9%BA%E4%BB%A3%E7%90%86%E7%AD%BE%E5%88%B0.py)  注册地址：[点我前往](http://www.xkdaili.com/?ic=7d6acs0s)
+* [品赞HTTP代理](https://raw.githubusercontent.com/Huansheng1/my-qinglong-js/main/%E5%93%81%E8%B5%9EHTTP%E4%BB%A3%E7%90%86%E7%AD%BE%E5%88%B0.js)  注册地址：[点我前往](https://www.ipzan.com?pid=oviuk6128)
 
 ### 报错提示
 1. `/ql/data/config/config.sh: line xxx`：`这种基本都是配置文件里的数据配错了，导致qinglong读取环境变量直接崩了，请检查是否多了空格或者格式不合法`
