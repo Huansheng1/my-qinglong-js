@@ -1,11 +1,11 @@
 """"
-author: 不知道是谁啊，但是肯定是狗阿慈干的
+author: 不知道是谁啊
 cron: 2 8 * * *
 new Env('望潮自动抽奖')
 
-望潮自动抽奖魔改版 V1.20
+望潮自动抽奖版本 V1.30
 环境变量 wangchao_data 多号@分割
-ck格式 手机号&密码 或者 sessionId&accountId
+ck格式 手机号#密码 或者 sessionId#accountId
 """
 import hashlib
 import random
@@ -31,6 +31,7 @@ def load_send():
             print("加载通知服务成功！")
         except Exception as e:
             send = False
+            # # raise e
             print(e)
             print('''加载通知服务失败~\n请自行补全SendNotify依赖"''')
     else:
@@ -69,7 +70,7 @@ def pd1(ck):
     return url_safe_cipher_text
 
 
-class Ghdy:
+class Task:
     def __init__(self, ck):
         if len(ck) < 2:
             print("账号数据异常：", ck)
@@ -169,10 +170,11 @@ class Ghdy:
                 for k, y in cookies_dict.items():
                     self.JSESSIONID = f"{k}={y}"
             elif "失败" in r.json()["msg"]:
-                xx = f'⛔️{r.json()["msg"]}'
+                xx = f'⛔️ {r.json()["msg"]}'
                 self.msg += xx + "\n"
                 print(xx)
         except Exception as e:
+            # raise e
             print(e)
 
     def get_id(self):
@@ -199,24 +201,27 @@ class Ghdy:
             if "成功" in r.json()["msg"]:
                 r_list = r.json()["data"]["articleIsReadList"]
                 id_dict = {}
-                for i in r_list:
+                filtered_list = [obj for obj in r_list if not obj.get("isRead")]
+                for i in filtered_list:
                     id_dict[i["id"]] = i["newsId"]
+                # print(id_dict)
                 self.id_dict = id_dict
                 if self.id_dict:
-                    xx = "✅文章加载成功"
+                    xx = f"✅ 文章加载成功，今日共{len(r_list)}篇文章，待阅读文章数 {len(filtered_list)}"
                     self.msg += xx + "\n"
                     print(xx)
             elif "重新" in r.json()["msg"]:
-                xx = f'⛔️文章加载失败：{r.json()["msg"]}'
+                xx = f'⛔️ 文章加载失败：{r.json()["msg"]}'
                 print(xx)
                 self.msg += xx + "\n"
 
             else:
-                xx = f'⛔️请求异常：{r.json()["msg"]}'
+                xx = f'⛔️ 请求异常：{r.json()["msg"]}'
                 print(xx)
                 self.msg += xx + "\n"
 
         except Exception as e:
+            # raise e
             print(e)
 
     def look(self):
@@ -251,11 +256,23 @@ class Ghdy:
                 params = {
                     "id": new_id,
                 }
+                # print(new_id)
                 r = requests.get(url, params=params, headers=headers)
                 if r.json()["message"] == "success":
-                    xx = f'✅开始浏览《{r.json()["data"]["article"]["list_title"]}》'
+                    xx = f'✅ 开始浏览 [{new_id}]《{r.json()["data"]["article"]["list_title"]}》'
                     print(xx)
                     self.msg += xx + "\n"
+                elif "msg" not in r.json():
+                    print(f"浏览 [{new_id}] 失败，开启强制阅读：{r.json().get('message',r.text)}")
+                elif "不存在" in r.json()["msg"]:
+                    xx = f'⛔️ 浏览 [{new_id}] 失败，开启强制阅读：{r.json()["msg"]}'
+                    print(xx)
+                    self.msg += xx + "\n"
+                else:
+                    xx = f'⛔️ 浏览 [{new_id}] 异常，开启强制阅读：{r.json()["msg"]}'
+                    print(xx)
+                    self.msg += xx + "\n"
+                if True:
                     time.sleep(3)
                     current_timestamp = int(time.time() * 1000)
                     sha = f"&&{idd}&&TlGFQAOlCIVxnKopQnW&&{current_timestamp}"
@@ -288,27 +305,20 @@ class Ghdy:
                         params=params,
                         headers=headers,
                     )
-                    if "成功" in r.json()["msg"]:
-                        xx = f"✅浏览完成"
+                    if "msg" not in r.json():
+                        print(f"浏览文章 [{new_id}] 失败：{r.text}")
+                    elif "成功" in r.json()["msg"]:
+                        xx = f"✅ 浏览 [{new_id}] 完成"
                         print(xx)
                         self.msg += xx + "\n"
                     elif "重新" in r.json()["msg"]:
-                        xx = f'⛔️浏览失败：{r.json()["msg"]}'
+                        xx = f'⛔️ 浏览 [{new_id}] 失败：{r.json()["msg"]}'
                         print(xx)
                         self.msg += xx + "\n"
                     else:
-                        xx = f'⛔️浏览异常：{r.json()["msg"]}'
+                        xx = f'⛔️ 浏览 [{new_id}] 异常：{r.json()["msg"]}'
                         print(xx)
                         self.msg += xx + "\n"
-                elif "不存在" in r.json()["msg"]:
-                    xx = f'⛔️浏览失败：{r.json()["msg"]}'
-                    print(xx)
-                    self.msg += xx + "\n"
-
-                else:
-                    xx = f'⛔️浏览异常：{r.json()["msg"]}'
-                    print(xx)
-                    self.msg += xx + "\n"
 
             c_headers = {
                 "Host": "xmt.taizhou.com.cn",
@@ -331,8 +341,10 @@ class Ghdy:
                 f"https://xmt.taizhou.com.cn/prod-api/user-read-count/count/{today}",
                 headers=c_headers,
             )
-            if "成功" in c_r.json()["msg"]:
-                xx = f"✅全部浏览完成，准备开始抽红包吧！"
+            if "msg" not in c_r.json():
+                print(f"❌ 获取阅读文章数失败：{c_r.json().get('message')}")
+            elif "成功" in c_r.json()["msg"]:
+                xx = f"✅ 全部浏览完成，准备开始抽红包吧！"
                 print(xx)
                 self.msg += xx + "\n"
             else:
@@ -340,6 +352,7 @@ class Ghdy:
                 print(xx)
                 self.msg += xx + "\n"
         except Exception as e:
+            # raise e
             print(e)
 
     def chou(self):
@@ -364,93 +377,98 @@ class Ghdy:
                 "accountId": self.account,
                 "sessionId": self.session,
             }
-            c_r = requests.get(
-                "https://srv-app.taizhou.com.cn/tzrb/user/loginWC",
-                params=c_params,
-                headers=c_headers,
-            )
-            jsessionid = c_r.cookies
-            cookies_dict = jsessionid.get_dict()
-            for k, y in cookies_dict.items():
-                JSESSIONID = f"{k}={y}"
-                self.s_JSESSIONID = JSESSIONID
-            url = (
-                "https://srv-app.taizhou.com.cn/tzrb/userAwardRecordUpgrade/saveUpdate"
-            )
-            headers = {
-                "Host": "srv-app.taizhou.com.cn",
-                "Connection": "keep-alive",
-                "Content-Length": "13",
-                "Pragma": "no-cache",
-                "Cache-Control": "no-cache",
-                "User-Agent": "Mozilla/5.0 (Linux; Android 11; Redmi Note 8 Pro Build/RP1A.200720.011; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/87.0.4280.141 Mobile Safari/537.36;xsb_wangchao;xsb_wangchao;5.3.1;native_app",
-                "Content-type": "application/x-www-form-urlencoded",
-                "Accept": "*/*",
-                "Origin": "https://srv-app.taizhou.com.cn",
-                "X-Requested-With": "com.shangc.tiennews.taizhou",
-                "Sec-Fetch-Site": "same-origin",
-                "Sec-Fetch-Mode": "cors",
-                "Sec-Fetch-Dest": "empty",
-                "Referer": "https://srv-app.taizhou.com.cn/luckdraw/",
-                "Accept-Encoding": "gzip, deflate",
-                "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
-                "Cookie": self.s_JSESSIONID,
-            }
-            data = {
-                "activityId": "67",
-            }
-            r = requests.post(url, headers=headers, data=data)
-            if "成功" in r.json()["message"]:
-                xx = f"✅抽奖成功"
-                print(xx)
-                self.msg += xx + "\n"
-            elif "明天" in r.json()["message"]:
-                xx = f'❌{r.json()["message"]}'
-                print(xx)
-                self.msg += xx + "\n"
-            else:
-                xx = f'⛔️{r.json()["message"]}'
-                print(xx)
-                self.msg += xx + "\n"
-            jl_headers = {
-                "Host": "srv-app.taizhou.com.cn",
-                "Connection": "keep-alive",
-                "Pragma": "no-cache",
-                "Cache-Control": "no-cache",
-                "User-Agent": "Mozilla/5.0 (Linux; Android 11; Redmi Note 8 Pro Build/RP1A.200720.011; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/87.0.4280.141 Mobile Safari/537.36;xsb_wangchao;xsb_wangchao;5.3.1;native_app",
-                "Accept": "*/*",
-                "X-Requested-With": "com.shangc.tiennews.taizhou",
-                "Sec-Fetch-Site": "same-origin",
-                "Sec-Fetch-Mode": "cors",
-                "Sec-Fetch-Dest": "empty",
-                "Referer": "https://srv-app.taizhou.com.cn/luckdraw/",
-                "Accept-Encoding": "gzip, deflate",
-                "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
-                "Cookie": self.s_JSESSIONID,
-            }
-            jl_params = {
-                "pageSize": "10",
-                "pageNum": "1",
-                "activityId": "67",
-            }
-            jl_r = requests.get(
-                "https://srv-app.taizhou.com.cn/tzrb/userAwardRecordUpgrade/pageList",
-                params=jl_params,
-                headers=jl_headers,
-            )
-            if "成功" in jl_r.json()["message"]:
-                jl_list = jl_r.json()["data"]["records"]
-                xx = "🎁抽奖记录🎁"
-                print(xx)
-                self.msg += xx + "\n"
-                for i in jl_list:
-                    xx = f'⏰{i["createTime"]}: {i["awardName"]}'
+            try:
+                c_r = requests.get(
+                    "https://srv-app.taizhou.com.cn/tzrb/user/loginWC",
+                    params=c_params,
+                    headers=c_headers,
+                )
+                jsessionid = c_r.cookies
+                cookies_dict = jsessionid.get_dict()
+                for k, y in cookies_dict.items():
+                    JSESSIONID = f"{k}={y}"
+                    self.s_JSESSIONID = JSESSIONID
+                url = "https://srv-app.taizhou.com.cn/tzrb/userAwardRecordUpgrade/saveUpdate"
+                headers = {
+                    "Host": "srv-app.taizhou.com.cn",
+                    "Connection": "keep-alive",
+                    "Content-Length": "13",
+                    "Pragma": "no-cache",
+                    "Cache-Control": "no-cache",
+                    "User-Agent": "Mozilla/5.0 (Linux; Android 11; Redmi Note 8 Pro Build/RP1A.200720.011; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/87.0.4280.141 Mobile Safari/537.36;xsb_wangchao;xsb_wangchao;5.3.1;native_app",
+                    "Content-type": "application/x-www-form-urlencoded",
+                    "Accept": "*/*",
+                    "Origin": "https://srv-app.taizhou.com.cn",
+                    "X-Requested-With": "com.shangc.tiennews.taizhou",
+                    "Sec-Fetch-Site": "same-origin",
+                    "Sec-Fetch-Mode": "cors",
+                    "Sec-Fetch-Dest": "empty",
+                    "Referer": "https://srv-app.taizhou.com.cn/luckdraw/",
+                    "Accept-Encoding": "gzip, deflate",
+                    "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
+                    "Cookie": self.s_JSESSIONID,
+                }
+                data = {
+                    "activityId": "67",
+                }
+                r = requests.post(url, headers=headers, data=data)
+                if "msg" not in r.json():
+                    xx = f'❌ {r.json()["message"]}'
+                    print(xx)
+                elif "成功" in r.json()["message"]:
+                    xx = f"✅ 抽奖成功"
                     print(xx)
                     self.msg += xx + "\n"
-                send("🔔原神启动", self.msg)
-            else:
-                send("🔔原神启动", self.msg)
+                elif "明天" in r.json()["message"]:
+                    xx = f'❌ {r.json()["message"]}'
+                    print(xx)
+                    self.msg += xx + "\n"
+                else:
+                    xx = f'⛔️ {r.json()["message"]}'
+                    print(xx)
+                    self.msg += xx + "\n"
+                jl_headers = {
+                    "Host": "srv-app.taizhou.com.cn",
+                    "Connection": "keep-alive",
+                    "Pragma": "no-cache",
+                    "Cache-Control": "no-cache",
+                    "User-Agent": "Mozilla/5.0 (Linux; Android 11; Redmi Note 8 Pro Build/RP1A.200720.011; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/87.0.4280.141 Mobile Safari/537.36;xsb_wangchao;xsb_wangchao;5.3.1;native_app",
+                    "Accept": "*/*",
+                    "X-Requested-With": "com.shangc.tiennews.taizhou",
+                    "Sec-Fetch-Site": "same-origin",
+                    "Sec-Fetch-Mode": "cors",
+                    "Sec-Fetch-Dest": "empty",
+                    "Referer": "https://srv-app.taizhou.com.cn/luckdraw/",
+                    "Accept-Encoding": "gzip, deflate",
+                    "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
+                    "Cookie": self.s_JSESSIONID,
+                }
+                jl_params = {
+                    "pageSize": "10",
+                    "pageNum": "1",
+                    "activityId": "67",
+                }
+                jl_r = requests.get(
+                    "https://srv-app.taizhou.com.cn/tzrb/userAwardRecordUpgrade/pageList",
+                    params=jl_params,
+                    headers=jl_headers,
+                )
+                if "成功" in jl_r.json()["message"]:
+                    jl_list = jl_r.json()["data"]["records"]
+                    xx = "🎁 抽奖记录🎁 "
+                    print(xx)
+                    self.msg += xx + "\n"
+                    for i in jl_list:
+                        xx = f'⏰ {i["createTime"]}: {i["awardName"]}'
+                        print(xx)
+                        self.msg += xx + "\n"
+                    send("🔔原神启动", self.msg)
+                else:
+                    send("🔔原神启动", self.msg)
+            except requests.RequestException as e:
+                print(f"登录活动出错： {e}")
         except Exception as e:
+            # raise e
             print(e)
 
 
@@ -458,15 +476,18 @@ if __name__ == "__main__":
     print = partial(print, flush=True)
     token = get_environ("wangchao_data")
     cks = token.split("@")
-    print("🔔检测到{}个ck记录🔔\n".format(len(cks)))
+    print("🔔检测到{}个ck记录🔔\n更多脚本：https://github.com/Huansheng1/my-qinglong-js\n".format(len(cks)))
     for ck_all in cks:
         try:
             ck = ck_all.split("&")
-            run = Ghdy(ck)
-            print()
+            run = Task(ck)
+            print("-" * 32)
             run.login()
             run.get_id()
             run.look()
+            print("-" * 32)
             run.chou()
         except Exception as e:
-            print(e)
+            # raise e
+            # print(e)
+            pass
