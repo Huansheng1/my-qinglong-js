@@ -89,8 +89,8 @@ try:
             )
             resJon = response.json()
             tipMessage = ""
-            if resJon.get("point"):
-                tipMessage = f'签到成功，获得 {resJon.get("point")} 星币'
+            if resJon.get("msg",{"point":0}).get("point"):
+                tipMessage = f'签到成功，获得 {resJon.get("msg",{"point":0}).get("point")} 星币'
             else:
                 tipMessage = f"签到失败 {resJon.get('msg') or response.text} "
             print(tipMessage)
