@@ -33,7 +33,7 @@
 
 ## 赞赏🥰
 如果您觉得本项目对您有用，可以请我喝杯咖啡表示鼓励。
-![image.png](./img/support-author.jpg)
+<img src="./imgs/donation.jpg" alt="image.png" style="zoom:50%;" />
 
 ## 代码测试说明书👇
 
@@ -44,7 +44,7 @@
 #### 运行说明
 旧版本：
 ```bash
-ql repo https://ghp.ci/https://github.com/Huansheng1/my-qinglong-js "" "sendNotify.js|utils.js|SendNotify" "sendNotify.js|utils.js|SendNotify" "main"
+ql repo https://ghp.ci/https://github.com/Huansheng1/my-qinglong-js "" "sendNotify.js|utils.js|SendNotify|imgs" "sendNotify.js|utils.js|SendNotify" "main"
 ```
 新版：  
 新建订阅 - 在名称处粘贴上面命令，定时更新时间自己设置 - 
