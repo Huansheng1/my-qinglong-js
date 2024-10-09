@@ -33,7 +33,7 @@
 
 ## 赞赏🥰
 如果您觉得本项目对您有用，可以请我喝杯咖啡表示鼓励。
-<img src="./imgs/donation.jpg" alt="image.png" style="zoom:50%;" />
+![打赏](./imgs/donation.jpg)
 
 ## 代码测试说明书👇
 
