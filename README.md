@@ -1,4 +1,7 @@
 # 幻生自用青龙Script脚本
+[![GitHub stars](https://img.shields.io/github/stars/Huansheng1/my-qinglong-js.svg?label=github%20stars)](https://github.com/Huansheng1/my-qinglong-js)
+[![JavaScript](https://img.shields.io/badge/--F7DF1E?logo=javascript&logoColor=000)](https://wechaty.js.org/docs/polyglot/typescript/)
+[![Python](https://img.shields.io/badge/--3670A0?logo=python&logoColor=ffdd54)](https://wechaty.js.org/docs/polyglot/python/)
 ## 说明
 > 不再更新有风险的项目，更多正规APP的相关脚本请挪步好友仓库
 1. [小鹿青龙面板脚本公共仓库](https://github.com/smallfawn/QLScriptPublic)
@@ -71,6 +74,11 @@ ql repo https://ghp.ci/https://github.com/Huansheng1/my-qinglong-js "" "sendNoti
 2. 两个依赖，一个 `https-proxy-agent`，一个 `http-proxy-agent`；两个都要装！别再问了🤡
 3. 还有`./utils.js`是文件！不是依赖，单拉文件不是拉整个仓库的去仓库里找到 `utils.js` 文件，放到要运行的脚本同一目录下，别给我装依赖了🥶
 
+## 赞助列表
+| 赞助者 | 金额 | 留言or备注 | 时间 |
+| ---- | ---- | ---- | ---- |
+| 王子月 | 5.88 | 没配置好wxpuher祝多出本 | 2024年10月10日 |
+| 清树 | 8.88 | 撤回爱称 | 2024年10月9日 |
 
 ## Star History
 
