@@ -3,9 +3,7 @@
 [![JavaScript](https://img.shields.io/badge/--F7DF1E?logo=javascript&logoColor=000)](https://wechaty.js.org/docs/polyglot/typescript/)
 [![Python](https://img.shields.io/badge/--3670A0?logo=python&logoColor=ffdd54)](https://wechaty.js.org/docs/polyglot/python/)
 ## 说明
-> 不再更新有风险的项目，更多正规APP的相关脚本请挪步好友仓库
-1. [小鹿青龙面板脚本公共仓库](https://github.com/smallfawn/QLScriptPublic)
-2. [滑稽青龙面板脚本公共仓库](https://github.com/huaji8/huajiScript.git)
+> 不再更新有风险的项目，投稿请建立issue或者TG私聊，酌情更新
 
 ## 特别声明
 ### 一旦使用或复制了任何相关脚本或Script项目，则视为您已接受免责声明
@@ -73,6 +71,9 @@ ql repo https://ghp.ci/https://github.com/Huansheng1/my-qinglong-js "" "sendNoti
 1. `/ql/data/config/config.sh: line xxx`：`这种基本都是配置文件里的数据配错了，导致qinglong读取环境变量直接崩了，请检查是否多了空格或者格式不合法`
 2. 两个依赖，一个 `https-proxy-agent`，一个 `http-proxy-agent`；两个都要装！别再问了🤡
 3. 还有`./utils.js`是文件！不是依赖，单拉文件不是拉整个仓库的去仓库里找到 `utils.js` 文件，放到要运行的脚本同一目录下，别给我装依赖了🥶
+
+## 其他项目
+* [微信自动阅读助手](https://github.com/Huansheng1/wechat-auto-read-helper)
 
 ## 赞助列表
 | 赞助者 | 金额 | 留言or备注 | 时间 |
