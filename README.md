@@ -84,3 +84,6 @@ ql repo https://ghp.ci/https://github.com/Huansheng1/my-qinglong-js "" "sendNoti
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=Huansheng1/my-qinglong-js&type=Date)](https://star-history.com/#Huansheng1/my-qinglong-js&Date)
+
+## 访问量
+![Visitor Count](https://profile-counter.glitch.me/huansheng-my-qinglong-js/count.svg)
