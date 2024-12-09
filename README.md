@@ -64,7 +64,7 @@ ql repo https://ghp.ci/https://github.com/Huansheng1/my-qinglong-js "" "sendNoti
 
 * [星空代理](https://raw.githubusercontent.com/Huansheng1/my-qinglong-js/main/%E6%98%9F%E7%A9%BA%E4%BB%A3%E7%90%86%E7%AD%BE%E5%88%B0.py)  注册地址：[点我前往](http://www.xkdaili.com/?ic=7d6acs0s)   ---- 脚本自动签到领取星币，兑换IP
 * [品赞HTTP代理](https://raw.githubusercontent.com/Huansheng1/my-qinglong-js/main/%E5%93%81%E8%B5%9EHTTP%E4%BB%A3%E7%90%86%E7%AD%BE%E5%88%B0.js)  注册地址：[点我前往](https://www.ipzan.com?pid=oviuk6128)   ---- 脚本自动签到领取金币，兑换IP
-* 携趣HTTP代理  注册地址：[点我前往](https://www.xiequ.cn/)   ---- 注册实名，每日赠送有效时长为30秒的1000个高匿IP
+* [携趣HTTP代理](https://raw.githubusercontent.com/Huansheng1/my-qinglong-js/refs/heads/main/%E6%90%BA%E8%B6%A3%E8%87%AA%E5%8A%A8%E5%8A%A0%E7%99%BD.py)  注册地址：[点我前往](https://www.xiequ.cn/)   ---- 注册实名，每日赠送有效时长为30秒的1000个高匿IP
 * 51HTTP代理  注册地址：[点我前往](https://m.51daili.com/index/user/promotion/parent_id/10869/code/d7ZrBnPQ.html)   ---- 注册实名，注册送20积分，每天签到送1积分，可用积分提取代理IP
 
 ### 报错提示
