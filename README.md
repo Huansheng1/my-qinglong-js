@@ -66,6 +66,7 @@ ql repo https://ghp.ci/https://github.com/Huansheng1/my-qinglong-js "" "sendNoti
 * [品赞HTTP代理](https://raw.githubusercontent.com/Huansheng1/my-qinglong-js/main/%E5%93%81%E8%B5%9EHTTP%E4%BB%A3%E7%90%86%E7%AD%BE%E5%88%B0.js)  注册地址：[点我前往](https://www.ipzan.com?pid=oviuk6128)   ---- 脚本自动签到领取金币，兑换IP
 * [携趣HTTP代理](https://raw.githubusercontent.com/Huansheng1/my-qinglong-js/refs/heads/main/%E6%90%BA%E8%B6%A3%E8%87%AA%E5%8A%A8%E5%8A%A0%E7%99%BD.py)  注册地址：[点我前往](https://www.xiequ.cn/)   ---- 注册实名，每日赠送有效时长为30秒的1000个高匿IP
 * 51HTTP代理  注册地址：[点我前往](https://m.51daili.com/index/user/promotion/parent_id/10869/code/d7ZrBnPQ.html)   ---- 注册实名，注册送20积分，每天签到送1积分，可用积分提取代理IP
+* [熊猫代理](https://raw.githubusercontent.com/Huansheng1/my-qinglong-js/refs/heads/main/%E7%86%8A%E7%8C%AB%E4%BB%A3%E7%90%86.py)  注册地址：[点我前往](http://www.xiongmaodaili.com?invitationCode=2A609042-FAC9-4943-BBF7-04A4D9F471A3)   ---- 自动签到获取积分，积分可以兑换优惠券和余额
 
 ### 报错提示
 1. `/ql/data/config/config.sh: line xxx`：`这种基本都是配置文件里的数据配错了，导致qinglong读取环境变量直接崩了，请检查是否多了空格或者格式不合法`
