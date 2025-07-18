@@ -3,6 +3,7 @@
 变量名：FIVE_ONE_PROXY_APPKEY
 变量值：秘钥
 脚本功能：添加 IP 到白名单
+注册地址：https://www.51daili.com/index/user/promotion/parent_id/10869/code/d7ZrBnPQ.html
 作者：Huansheng
 定时：0 0-23 * * *
 '''
